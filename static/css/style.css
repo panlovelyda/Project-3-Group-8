@@ -38,3 +38,24 @@ body {
     box-shadow: 0 0 15px rgb(0 0 0 / 20%);
     border-radius: 5px;
   }
+
+  .leaflet-popup-content h2{
+    color: darkred;
+  }
+  
+  .legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin: 0 8px 2px 0;
+    opacity: 1;
+    text-align:justify;
+    text-justify:newspaper;
+  } 
+  
+  .labels h4{
+    text-align: center;
+    font-size: 16px;
+    margin: 8px 12px 8px;
+    color: darkred;
+    }
