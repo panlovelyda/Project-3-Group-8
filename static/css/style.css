@@ -1,0 +1,40 @@
+body {
+    padding: 0;
+    margin: 0;
+  }
+  
+  #map,
+  body,
+  html {
+    height: 100%;
+  }
+  
+  .leaflet-popup-content {
+    text-align: center;
+  }
+
+  .min {
+    background-color: white;
+    color: green;
+  }
+
+  
+  .max {
+    background-color: white;
+    color: red;
+  }
+
+  .legend {
+    text-align: left;
+    line-height: 18px;
+    color: #555;
+  }
+
+  .info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgb(0 0 0 / 20%);
+    border-radius: 5px;
+  }
