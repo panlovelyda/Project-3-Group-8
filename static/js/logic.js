@@ -12,15 +12,8 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 // Load the GeoJSON data.
 let geoData = "https://raw.githubusercontent.com/tonywr71/GeoJson-Data/e33126bb38ede356f79737a160aa16f8addfd8b3/suburb-2-vic.geojson";
 
-// To do:
-
 // Get the data with d3.
 d3.json(geoData).then(function(response) {
-
-  //features = response.features;
-  //console.log("features: ",features);
- // L.geoJson(response).addTo(myMap);
-
 
   // sql.js
   let config = {locateFile: () => "static/js/sql-wasm.wasm"}
@@ -44,9 +37,8 @@ d3.json(geoData).then(function(response) {
           console.log("features: ",features) */
           for (var i in response.features) {
 /*             console.log("each i, features[i].properties.vic_loca_2: ", i, features[i].properties.vic_loca_2) */
-            // default is 0
+            // default is Not Avaliable
             response.features[i].properties['vic_loca_8'] = 'NA'
-            //response.features[i].properties['vic_loca_9'] = value
             //if sqllite have data, give it
             for (var j in contents[0].values) { 
               if ( contents[0].values[j][0] == response.features[i].properties.vic_loca_2 ) {
@@ -82,9 +74,8 @@ d3.json(geoData).then(function(response) {
             var colors = choroplethLayer.options.colors;
             var labels = [];
         
-            // Add min & max
-            div.innerHTML = `<div class="labels"><div class="min"> Min: ${limits[0]} </div> \
-              <div class="max"> Max: ${limits[limits.length - 1]} </div></div>`;
+            // Notice
+            div.innerHTML = `<div class="labels"><div class "notice">White means no data</div></div>`;
 
             var lastlimit;
             limits.forEach(function (limit, index) {
@@ -104,13 +95,5 @@ d3.json(geoData).then(function(response) {
           legend.addTo(myMap);
       };
       search.send();
-
-
-      
   });
-  
-
-
-
-
 })
