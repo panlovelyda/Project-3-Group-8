@@ -1,8 +1,16 @@
+var dataSet
+var myMap
+
+function choroplethMap(value) {
 // Creating the map object
-let myMap = L.map("map", {
+if ( myMap != undefined ) {
+  myMap.off();
+  myMap.remove();
+}
+myMap = L.map("map", {
   center: [ -37.813628,  144.963058],
   zoom: 11
-});
+})
 
 // Adding the tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -10,17 +18,17 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(myMap);
 
 // Load the GeoJSON data.
-let geoData = "https://raw.githubusercontent.com/tonywr71/GeoJson-Data/e33126bb38ede356f79737a160aa16f8addfd8b3/suburb-2-vic.geojson";
+var geoData = "https://raw.githubusercontent.com/tonywr71/GeoJson-Data/e33126bb38ede356f79737a160aa16f8addfd8b3/suburb-2-vic.geojson";
 
 // Get the data with d3.
 d3.json(geoData).then(function(response) {
 
   // sql.js
-  let config = {locateFile: () => "static/js/sql-wasm.wasm"}
+  var config = {locateFile: () => "static/js/sql-wasm.wasm"}
 
  // var value='2020-2021'
  // var value='2011-2021'
-  var value='Growth PA'
+ // var value='Growth PA'
   initSqlJs(config).then(function(SQL){
       const search = new XMLHttpRequest();
       search.open('GET', "static/data/house.sqlite", true);
@@ -80,16 +88,16 @@ d3.json(geoData).then(function(response) {
             var lastlimit;
             limits.forEach(function (limit, index) {
               if ( index == 0 )
-                labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${limit}<br clear="all">`);
+                labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(limit*10)/10}<br clear="all">`);
               else {
-                labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${lastlimit} - ${limit}<br clear="all">`);
+                labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(lastlimit*10)/10} - ${Math.round(limit*10)/10}<br clear="all">`);
               }
               lastlimit=limit;
             }); 
 
             div.innerHTML += `<div class="info legend"> ${labels.join('')} </div>`;
             //div.innerHTML += '<div style="list-style: none;">' + labels.join('') + '</div>';
-            console.log("div: ",div);
+            //console.log("div: ",div);
             return div;
           };
           legend.addTo(myMap);
@@ -97,3 +105,31 @@ d3.json(geoData).then(function(response) {
       search.send();
   });
 })
+
+}
+
+var element = document.getElementById("selDataset");
+
+var select=['2020-2021','2011-2021','Growth PA']
+for (var i in select) {
+  console.log("i=",i)
+  console.log("select[i]=",select[i])
+  var subjectList = document.createElement("option");
+  //subjectList.text = parseInt(select[i]);
+  subjectList.text = select[i];
+  subjectList.value = select[i];
+  element.append(subjectList, element[null]);
+};
+
+var value = document.getElementById("selDataset").value;
+
+/* barChart(value);
+bubbleChart(value);
+metadataDisplay(value);
+gaugeChart(value); */
+choroplethMap(value)
+
+function optionChanged(value){
+
+  choroplethMap(value)
+}
