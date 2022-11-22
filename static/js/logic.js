@@ -137,34 +137,87 @@ function suburbBar(value)
           var SQLstmt= `SELECT year, median FROM median_house where suburb = '${value}' order by year`;
           console.log("SQLstmt: ",SQLstmt);
 
-          const contents = db.exec(SQLstmt);
-          console.log("contents: ",contents);
+          const contents1 = db.exec(SQLstmt);
+          console.log("contents: ",contents1);
 
-          var xList=[];
-          var yList=[];
+          var xList1=[];
+          var yList1=[];
           
-          for (var j in contents[0].values) {
-            xList.push(contents[0].values[j][0]);
-            yList.push(contents[0].values[j][1]);
+          for (var j in contents1[0].values) {
+            xList1.push(contents1[0].values[j][0]);
+            yList1.push(contents1[0].values[j][1]);
           }
+
+          var SQLstmt= `SELECT period, change_percent FROM change where suburb = '${value}' and period != 'Growth PA' and period != '2011-2021' order by period`;
+          console.log("SQLstmt: ",SQLstmt);
+
+          const contents2 = db.exec(SQLstmt);
+          console.log("contents: ",contents2);
+
+          var xList2=[];
+          var yList2=[];
+
+          for (var j in contents2[0].values) {
+            var str=contents2[0].values[j][0];
+            //console.log("str:",str);
+
+            var myArray=str.split("-",2);
+            //console.log("myArray:",myArray);
+            //var end =`${myArray[1]}`;
+            xList2.push(myArray[1]);
+            yList2.push(contents2[0].values[j][1]);
+          } 
+
 //
-          var plotData = [{
-            x: xList,
-            y: yList,
+        var trace1 = {
+          x: xList2,
+          y: yList2,
+          yaxis: 'y2',
+          name: 'Growth Rate',
+          type: 'scatter',
+          marker: {
+            color: 'rgba(4, 147, 114,0.8)',
+            width: 4
+          }
+        };
+
+        var trace2 = {
+          x: xList1,
+          y: yList1,
+          name: 'House Median',
+          type: 'bar',
+          marker: {
+            color: 'rgba(255,153,51,0.6)',
+            width: 1
+          }
+        };
+
+        var plotData = [trace1, trace2];
+//
+/*           var plotData = [{
+            x: xList1,
+            y: yList1,
             //text: yList,
             //orientation:'h',
             marker: {
               color: 'rgba(255,153,51,0.6)',
               width: 1
             },
-            type:"bar"}];
+            type:"bar"}]; */
 
           let layout = {
             title: {
               text:`<b>${value}</b><br>House Median`},
-            height: 450,
-            width: 450, 
-            margin: {"t": 80, "b": 80, "l": 80, "r": 10}
+/*             height: 450,
+            width: 450,  */
+            margin: {"t": 80, "b": 80, "l": 80, "r": 10},
+            yaxis2: {
+              title: 'Growth Rate %',
+              titlefont: {color: 'rgb(4, 147, 114)'},
+              tickfont: {color: 'rgb(4, 147, 114)'},
+              overlaying: 'y',
+              side: 'right'
+            }
             }; 
           config={responsive:true};
 
@@ -276,6 +329,7 @@ function trendLine(value){
             name: 'S&P/ASX 200',
             yaxis: 'y3',
             type: 'scatter'
+            
           };
           
           var Plotdata = [trace1, trace2, trace3];
@@ -285,8 +339,8 @@ function trendLine(value){
             yaxis: {title: 'Rate %'},
             yaxis3: {
               title: 'S&P/ASX 200',
-              titlefont: {color: 'rgb(148, 103, 189)'},
-              tickfont: {color: 'rgb(148, 103, 189)'},
+              titlefont: {color: 'rgb(34, 139, 34)'},
+              tickfont: {color: 'rgb(34, 139, 34)'},
               overlaying: 'y',
               side: 'right'
             }
