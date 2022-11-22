@@ -120,11 +120,8 @@ d3.json(geoData).then(function(response) {
 // bar chart for one suburb
 function suburbBar(value)
 {
-  console.log("value:", value)
    // sql.js
   var config = {locateFile: () => "static/js/sql-wasm.wasm"}
-
-
 
   initSqlJs(config).then(function(SQL){
       const search = new XMLHttpRequest();
@@ -165,8 +162,8 @@ function suburbBar(value)
           let layout = {
             title: {
               text:`<b>${value}</b><br>House Median`},
-            height: 500,
-            width: 500, 
+            height: 450,
+            width: 450, 
             margin: {"t": 80, "b": 80, "l": 80, "r": 10}
             }; 
           config={responsive:true};
@@ -178,19 +175,137 @@ function suburbBar(value)
       search.send();
   });
 
-/*   
-  let sample = dataSet.samples.filter(subject => (subject.id === value));
-
-  let first10Otu = sample[0].otu_ids.slice(0,10).map((object)=>"OTU "+object+' ').reverse();
-  let first10Labels = sample[0].otu_labels.slice(0,10).reverse();
-  let first10Values= sample[0].sample_values.slice(0,10); 
-  first10Values.sort((a,b) => a-b);*/
-
- 
 }
 
-var element_subject = document.getElementById("selDataset");
+function trendLine(value){
+   // sql.js
+   var config = {locateFile: () => "static/js/sql-wasm.wasm"}
+   var x1List=[];
+   var y1List=[];
+   var x2List=[];
+   var y2List=[];
+   var x3List=[];
+   var y3List=[];
+
+   initSqlJs(config).then(function(SQL){
+       const search = new XMLHttpRequest();
+       //console.log("search: ",search);
+ 
+       search.open('GET', "static/data/interest_rate.sqlite", true);
+       //console.log("open: ",a);
+       search.responseType = 'arraybuffer';
+       search.onload = e => {
+          const uInt8Array = new Uint8Array(search.response);
+          const db = new SQL.Database(uInt8Array);
+
+          if (value.length == 4){
+            var start = `${value}-01-01`;
+            var end =`${value}-12-31`;
+            console.log("start4: ",start, "end: ",end);
+          }
+          else{
+            if (value == 'Growth PA') {
+              value = "2011-2021"
+            }
+            var myArray=value.split("-",2)
+            var start = `${myArray[0]}-01-01`;
+            var end =`${myArray[1]}-12-31`;
+            console.log("start9: ",start, "end: ",end);
+          }
+          // read cash_rate_target to x1,y1
+          var SQLstmt= `SELECT date(date),cash_rate_target FROM interest_rate where date between'${start}' and '${end}' order by date`;
+          console.log("SQLstmt: ",SQLstmt);
+ 
+          const contents1 = db.exec(SQLstmt);
+          console.log("contents interest: ",contents1);
+
+ 
+          for ( var j in contents1[0].values ){
+            x1List.push(contents1[0].values[j][0]);
+            y1List.push(contents1[0].values[j][1]);
+          }
+          console.log("x1List:",x1List);
+          console.log("y1List:",y1List);
+
+          // read house_inflation to x2,y2
+          var SQLstmt= `SELECT date(date),house_inflation_rate FROM house_inflation where date between'${start}' and '${end}' order by date`;
+          console.log("SQLstmt: ",SQLstmt);
+ 
+          const contents2 = db.exec(SQLstmt);
+          console.log("contents inflation: ",contents2);
+
+          for ( var j in contents2[0].values ){
+            x2List.push(contents2[0].values[j][0]);
+            y2List.push(contents2[0].values[j][1]);
+          }
+          console.log("x2List:",x2List);
+          console.log("y2List:",y2List);
+
+          // read xjo_close to x3,y3
+          var SQLstmt= `SELECT date(date),close_price FROM xjo_close where date between'${start}' and '${end}' order by date`;
+          console.log("SQLstmt: ",SQLstmt);
+ 
+          const contents3 = db.exec(SQLstmt);
+          console.log("contents xjo_close: ",contents3);
+
+          for ( var j in contents3[0].values ){
+            x3List.push(contents3[0].values[j][0]);
+            y3List.push(contents3[0].values[j][1]);
+          }
+          console.log("x3List:",x3List);
+          console.log("y3List:",y3List);
+
+          //
+          var trace1 = {
+            x: x1List,
+            y: y1List,
+            name: 'Interest Rate',
+            type: 'scatter'
+          };
+
+          var trace2 = {
+            x: x2List,
+            y: y2List,
+            name: 'Inflation Rate',
+            type: 'scatter'
+          };
+          
+          var trace3 = {
+            x: x3List,
+            y: y3List,
+            name: 'S&P/ASX 200',
+            yaxis: 'y3',
+            type: 'scatter'
+          };
+          
+          var Plotdata = [trace1, trace2, trace3];
+
+          var layout = {
+            title: '<b>S&P/ASX 200, Inflation and Interest Rate',
+            yaxis: {title: 'Rate %'},
+            yaxis3: {
+              title: 'S&P/ASX 200',
+              titlefont: {color: 'rgb(148, 103, 189)'},
+              tickfont: {color: 'rgb(148, 103, 189)'},
+              overlaying: 'y',
+              side: 'right'
+            }
+          };
+          config={responsive:true};
+
+          graphDiv = document.getElementById('line');
+          Plotly.newPlot("line", Plotdata, layout,config); 
+          
+          //Plotly.newPlot('myDiv', data, layout,config);
+          //
+        };
+       search.send();
+
+    });
+}
+
 var element_suburb = document.getElementById("selSuburb");
+var element_subject = document.getElementById("selDataset");
 
 var selectList=['2020-2021','2011-2021','Growth PA','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021']
 /* //let selectList = new Array();
@@ -288,13 +403,13 @@ const suburbArray=[];
 }); 
 
 choroplethMap(value);
-
+trendLine(value);
 
 
 function optionChanged(value){
 
   choroplethMap(value);
-  
+  trendLine(value);
 }
 
 function suburbChanged(suburb){

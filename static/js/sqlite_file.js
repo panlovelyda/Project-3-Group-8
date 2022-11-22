@@ -27,16 +27,22 @@ initSqlJs(config).then(function(SQL){
     search.send();
 }); 
 
+var SQLstmt;
 initSqlJs(config).then(function(SQL){
     const search = new XMLHttpRequest();
     search.open('GET', "static/data/XJO_close.sqlite", true);
     search.responseType = 'arraybuffer';
-    search.onload = e => {
+    search.onload = function() {
         const uInt8Array = new Uint8Array(search.response);
         const db = new SQL.Database(uInt8Array);
-        const contents = db.exec("SELECT * FROM xjo_close where date between '2011-01-01' and '2012-12-31'");
-        // console.log("JSON:", JSON.stringify(contents));
+        var year="2011"
+        var startDate=`${year}-01-01`
+        var endDate=`${year}-12-31`
+        var SQLstmt=`SELECT * FROM xjo_close where date between '${startDate}' and '${endDate}'`
+        const contents = db.exec(SQLstmt);
+        console.log("SQL", SQLstmt);
         console.log("contents3:", contents)
     };
     search.send();
 }); 
+console.log("SQL", SQLstmt);
