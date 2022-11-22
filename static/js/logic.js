@@ -69,7 +69,7 @@ d3.json(geoData).then(function(response) {
 
           var choroplethLayer = L.choropleth(response, {
             valueProperty: 'vic_loca_8', // which property in the features to use
-            scale: ['yellow', 'red'], // chroma.js scale - include as many as you like
+            scale: ['yellow', 'green'], // chroma.js scale - include as many as you like
             steps: 8, // number of breaks or steps in range
             mode: 'q', // q for quantile, e for equidistant, k for k-means
             style: {
@@ -176,7 +176,7 @@ function suburbBar(value)
           name: 'Growth Rate',
           type: 'scatter',
           marker: {
-            color: 'rgba(4, 147, 114,0.8)',
+            color: 'rgba(1, 152, 137,0.8)',
             width: 4
           }
         };
@@ -187,7 +187,7 @@ function suburbBar(value)
           name: 'House Median',
           type: 'bar',
           marker: {
-            color: 'rgba(255,153,51,0.6)',
+            color: 'rgba(35,203,127,0.6)',
             width: 1
           }
         };
