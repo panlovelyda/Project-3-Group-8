@@ -80,7 +80,7 @@ d3.json(geoData).then(function(response) {
             onEachFeature: function(feature, layer) {
               layer.bindPopup(`<b>${feature.properties.vic_loca_2}</b><br>${value}: ${feature.properties.vic_loca_8}<br>`
               )
-              
+            
             }
           }).addTo(myMap); 
 
@@ -117,7 +117,80 @@ d3.json(geoData).then(function(response) {
 
 }
 
-var element = document.getElementById("selDataset");
+// bar chart for one suburb
+function suburbBar(value)
+{
+  console.log("value:", value)
+   // sql.js
+  var config = {locateFile: () => "static/js/sql-wasm.wasm"}
+
+
+
+  initSqlJs(config).then(function(SQL){
+      const search = new XMLHttpRequest();
+      //console.log("search: ",search);
+
+      search.open('GET', "static/data/house.sqlite", true);
+      //console.log("open: ",a);
+      search.responseType = 'arraybuffer';
+      search.onload = e => {
+          const uInt8Array = new Uint8Array(search.response);
+          const db = new SQL.Database(uInt8Array);
+
+          var SQLstmt= `SELECT year, median FROM median_house where suburb = '${value}' order by year`;
+          console.log("SQLstmt: ",SQLstmt);
+
+          const contents = db.exec(SQLstmt);
+          console.log("contents: ",contents);
+
+          var xList=[];
+          var yList=[];
+          
+          for (var j in contents[0].values) {
+            xList.push(contents[0].values[j][0]);
+            yList.push(contents[0].values[j][1]);
+          }
+//
+          var plotData = [{
+            x: xList,
+            y: yList,
+            //text: yList,
+            //orientation:'h',
+            marker: {
+              color: 'rgba(255,153,51,0.6)',
+              width: 1
+            },
+            type:"bar"}];
+
+          let layout = {
+            title: {
+              text:`<b>${value}</b><br>House Median`},
+            height: 500,
+            width: 500, 
+            margin: {"t": 80, "b": 80, "l": 80, "r": 10}
+            }; 
+          config={responsive:true};
+
+          graphDiv = document.getElementById('bar');
+          Plotly.newPlot("bar", plotData, layout,config); 
+//
+      };
+      search.send();
+  });
+
+/*   
+  let sample = dataSet.samples.filter(subject => (subject.id === value));
+
+  let first10Otu = sample[0].otu_ids.slice(0,10).map((object)=>"OTU "+object+' ').reverse();
+  let first10Labels = sample[0].otu_labels.slice(0,10).reverse();
+  let first10Values= sample[0].sample_values.slice(0,10); 
+  first10Values.sort((a,b) => a-b);*/
+
+ 
+}
+
+var element_subject = document.getElementById("selDataset");
+var element_suburb = document.getElementById("selSuburb");
 
 var selectList=['2020-2021','2011-2021','Growth PA','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021']
 /* //let selectList = new Array();
@@ -171,15 +244,61 @@ console.log("selectList1:length", selectList1.length);
   subjectList.text = selectList[k];
   subjectList.value = selectList[k];
 
-  element.append(subjectList, element[null]); 
+  element_subject.append(subjectList, element_subject[null]); 
  };
 
-var value = document.getElementById("selDataset").value;
+ var value = document.getElementById("selDataset").value;
+  console.log("value: ", value);
 
-console.log("value:", value);
+ //sql.js get suburb list
+ var config = {locateFile: () => "static/js/sql-wasm.wasm"}
+
+const suburbArray=[];
+ initSqlJs(config).then(function(SQL){
+  const search = new XMLHttpRequest();
+  search.open('GET', "static/data/house.sqlite", true);
+  search.responseType = 'arraybuffer';
+  search.onload = e => {
+      const uInt8Array = new Uint8Array(search.response);
+      const db = new SQL.Database(uInt8Array);
+      const contents = db.exec("SELECT DISTINCT suburb FROM median_house order by suburb");
+      // console.log("JSON:", JSON.stringify(contents));
+      console.log("contents3:", contents)
+      for (var j in contents[0].values) {
+        suburbArray.push(contents[0].values[j][0])
+      }
+
+      for ( var k in suburbArray ) {
+        var subjectList = document.createElement("option");
+      
+        //subjectList.text = parseInt(select[i]);
+        subjectList.text = contents[0].values[k][0];
+        subjectList.value = contents[0].values[k][0];
+      
+        element_suburb.append(subjectList, element_suburb[null]); 
+        };
+
+      var suburb = document.getElementById("selSuburb").value;
+      console.log("suburb: ", suburb);
+      suburbBar(suburb);
+
+
+  };
+  search.send();
+}); 
+
 choroplethMap(value);
+
+
 
 function optionChanged(value){
 
   choroplethMap(value);
+  
+}
+
+function suburbChanged(suburb){
+
+  suburbBar(suburb)
+
 }
