@@ -78,9 +78,13 @@ d3.json(geoData).then(function(response) {
               fillOpacity: 0.8
             },
             onEachFeature: function(feature, layer) {
-              layer.bindPopup(`<b>${feature.properties.vic_loca_2}</b><br>${value}: ${feature.properties.vic_loca_8}<br>`
-              )
-            
+              if ( value.length == 4 ) {
+                layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Median: $${feature.properties.vic_loca_8}</h4>`);
+              }
+              else {
+                layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Growth Rate: ${feature.properties.vic_loca_8}%</h4>`);
+              }
+                         
             }
           }).addTo(myMap); 
 
