@@ -1,3 +1,9 @@
+index.html
+sql_test.html
+test_sqlite.html
+choropleth.html
+static/js/sqlite_file.js
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
