@@ -14,7 +14,8 @@ if ( myMap != undefined ) {
 }
 myMap = L.map("map", {
   center: [ -37.813628,  144.963058],
-  zoom: 11
+  zoom: 11,
+  scrollWheelZoom: false
 })
 
 // Adding the tile layer
@@ -79,12 +80,27 @@ d3.json(geoData).then(function(response) {
             },
             onEachFeature: function(feature, layer) {
               if ( value.length == 4 ) {
-                layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Median: $${feature.properties.vic_loca_8}</h4>`);
+                layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Median: $${feature.properties.vic_loca_8}</h4><button onclick="buttonFunction('${feature.properties.vic_loca_2}')">Median History</button>`);
               }
-              else {
-                layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Growth Rate: ${feature.properties.vic_loca_8}%</h4>`);
+              else {                layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Growth Rate: ${feature.properties.vic_loca_8}%</h4><button onclick="buttonFunction('${feature.properties.vic_loca_2}')">Median History</button>`);
               }
-                         
+            // when button in popup was press
+            buttonFunction  = (suburb) => {
+
+                element_suburb = document.getElementById("selSuburb");
+
+                if (element_suburb) {
+                  var x = element_suburb.querySelectorAll(`option[value="${suburb}"]`);
+                  if (x.length === 1) {
+                    //console.log(x[0].index);
+                    document.getElementById("selSuburb").selectedIndex = x[0].index;
+                  }
+                }
+                //document.getElementById("selSuburb").selectedIndex = -1;
+                suburbBar(suburb);
+                myMap.closePopup();
+              }
+            //
             }
           }).addTo(myMap); 
 
@@ -115,7 +131,9 @@ d3.json(geoData).then(function(response) {
           };
           legend.addTo(myMap);
       };
+
       search.send();
+
   });
 })
 
@@ -139,10 +157,10 @@ function suburbBar(value)
           const db = new SQL.Database(uInt8Array);
 
           var SQLstmt= `SELECT year, median FROM median_house where suburb = '${value}' order by year`;
-          console.log("SQLstmt: ",SQLstmt);
+          //console.log("SQLstmt: ",SQLstmt);
 
           const contents1 = db.exec(SQLstmt);
-          console.log("contents: ",contents1);
+          //console.log("contents1: ",contents1);
 
           var xList1=[];
           var yList1=[];
@@ -153,10 +171,10 @@ function suburbBar(value)
           }
 
           var SQLstmt= `SELECT period, change_percent FROM change where suburb = '${value}' and period != 'Growth PA' and period != '2011-2021' order by period`;
-          console.log("SQLstmt: ",SQLstmt);
+          //console.log("SQLstmt: ",SQLstmt);
 
           const contents2 = db.exec(SQLstmt);
-          console.log("contents: ",contents2);
+          //console.log("contents: ",contents2);
 
           var xList2=[];
           var yList2=[];
@@ -258,7 +276,7 @@ function trendLine(value){
           if (value.length == 4){
             var start = `${value}-01-01`;
             var end =`${value}-12-31`;
-            console.log("start4: ",start, "end: ",end);
+            //console.log("start4: ",start, "end: ",end);
           }
           else{
             if (value == 'Growth PA') {
@@ -267,50 +285,50 @@ function trendLine(value){
             var myArray=value.split("-",2)
             var start = `${myArray[0]}-01-01`;
             var end =`${myArray[1]}-12-31`;
-            console.log("start9: ",start, "end: ",end);
+            //console.log("start9: ",start, "end: ",end);
           }
           // read cash_rate_target to x1,y1
           var SQLstmt= `SELECT date(date),cash_rate_target FROM interest_rate where date between'${start}' and '${end}' order by date`;
-          console.log("SQLstmt: ",SQLstmt);
+          //console.log("SQLstmt: ",SQLstmt);
  
           const contents1 = db.exec(SQLstmt);
-          console.log("contents interest: ",contents1);
+          //console.log("contents interest: ",contents1);
 
  
           for ( var j in contents1[0].values ){
             x1List.push(contents1[0].values[j][0]);
             y1List.push(contents1[0].values[j][1]);
           }
-          console.log("x1List:",x1List);
-          console.log("y1List:",y1List);
+          //console.log("x1List:",x1List);
+          //console.log("y1List:",y1List);
 
           // read house_inflation to x2,y2
           var SQLstmt= `SELECT date(date),house_inflation_rate FROM house_inflation where date between'${start}' and '${end}' order by date`;
-          console.log("SQLstmt: ",SQLstmt);
+          //console.log("SQLstmt: ",SQLstmt);
  
           const contents2 = db.exec(SQLstmt);
-          console.log("contents inflation: ",contents2);
+          //console.log("contents inflation: ",contents2);
 
           for ( var j in contents2[0].values ){
             x2List.push(contents2[0].values[j][0]);
             y2List.push(contents2[0].values[j][1]);
           }
-          console.log("x2List:",x2List);
-          console.log("y2List:",y2List);
+          //console.log("x2List:",x2List);
+          //console.log("y2List:",y2List);
 
           // read xjo_close to x3,y3
           var SQLstmt= `SELECT date(date),close_price FROM xjo_close where date between'${start}' and '${end}' order by date`;
-          console.log("SQLstmt: ",SQLstmt);
+          //console.log("SQLstmt: ",SQLstmt);
  
           const contents3 = db.exec(SQLstmt);
-          console.log("contents xjo_close: ",contents3);
+          //console.log("contents xjo_close: ",contents3);
 
           for ( var j in contents3[0].values ){
             x3List.push(contents3[0].values[j][0]);
             y3List.push(contents3[0].values[j][1]);
           }
-          console.log("x3List:",x3List);
-          console.log("y3List:",y3List);
+          //console.log("x3List:",x3List);
+          //console.log("y3List:",y3List);
 
           //
           var trace1 = {
@@ -421,7 +439,6 @@ console.log("selectList1:length", selectList1.length);
  };
 
  var value = document.getElementById("selDataset").value;
-  console.log("value: ", value);
 
  //sql.js get suburb list
  var config = {locateFile: () => "static/js/sql-wasm.wasm"}
@@ -436,7 +453,7 @@ const suburbArray=[];
       const db = new SQL.Database(uInt8Array);
       const contents = db.exec("SELECT DISTINCT suburb FROM median_house order by suburb");
       // console.log("JSON:", JSON.stringify(contents));
-      console.log("contents3:", contents)
+      //console.log("contents3:", contents)
       for (var j in contents[0].values) {
         suburbArray.push(contents[0].values[j][0])
       }
@@ -452,9 +469,8 @@ const suburbArray=[];
         };
 
       var suburb = document.getElementById("selSuburb").value;
-      console.log("suburb: ", suburb);
+      //console.log("suburb: ", suburb);
       suburbBar(suburb);
-
 
   };
   search.send();
@@ -462,7 +478,6 @@ const suburbArray=[];
 
 choroplethMap(value);
 trendLine(value);
-
 
 function optionChanged(value){
 
