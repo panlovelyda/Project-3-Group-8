@@ -380,68 +380,70 @@ function trendLine(value){
     });
 }
 
-var element_suburb = document.getElementById("selSuburb");
+
 var element_subject = document.getElementById("selDataset");
 
-var selectList=['2011-2021','Growth PA','2021-2022','2020-2021','2019-2020','2018-2019','2017-2018','2016-2017','2015-2016','2014-2015','2013-2014','2012-2013','2011-2012','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021']
-/* //let selectList = new Array();
-var selectList = ['test'];
-var selectList1 = new Array();
-var selectList2 = new Array();
-var len=0;
+//var selectList=['2011-2021','Growth PA','2021-2022','2020-2021','2019-2020','2018-2019','2017-2018','2016-2017','2015-2016','2014-2015','2013-2014','2012-2013','2011-2012','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021']
+//* * //let selectList = new Array();
+var selectArray = [];
+
 // sql.js
 var config = {locateFile: () => "static/js/sql-wasm.wasm"};
 
 initSqlJs(config).then(function(SQL){
-    const search1 = new XMLHttpRequest();
-    search1.open('GET', "static/data/house.sqlite", true);
-    search1.responseType = 'arraybuffer';
-    search1.onload = e => {
-        const uInt8Array1 = new Uint8Array(search1.response);
-        const db1 = new SQL.Database(uInt8Array1);
-        var SQLstmt1= `SELECT DISTINCT period FROM change`
-        const contents1 = db1.exec(SQLstmt1);
+  const search = new XMLHttpRequest();
+  search.open('GET', "static/data/house.sqlite", true);
+  search.responseType = 'arraybuffer';
+  search.onload = e => {
+      const uInt8Array = new Uint8Array(search.response);
+      const db = new SQL.Database(uInt8Array);
+      var SQLstmt= `SELECT DISTINCT period FROM change order by period`
+      const contents1 = db.exec(SQLstmt);
 
-        console.log("contents",contents1);
+      //console.log("contents",contents1);
 
-        for ( var i in contents1[0].values ){
+      for ( var i in contents1[0].values ){
+        //console.log("period", String(contents1[0].values[i][0]));
+        selectArray.push(String(contents1[0].values[i][[0]]));
+      };
+      //console.log("selectList 1: ",selectArray);
 
+      var SQLstmt= `SELECT DISTINCT year FROM median_house order by year DESC`
+      const contents2 = db.exec(SQLstmt);
+      for ( var i in contents2[0].values ){
+        //console.log("year", String(contents2[0].values[i][0]));
+        selectArray.push(String(contents2[0].values[i][0]));
+      };
+      //console.log("selectList 2: ",selectArray);
 
-          console.log("temp1", String(contents1[0].values[i][0]));
+      for ( var k in selectArray ) {
+        var subjectList = document.createElement("option");
+      
+        //subjectList.text = parseInt(select[i]);
+/*           subjectList.text = contents6[0].values[k][0];
+        subjectList.value = contents6[0].values[k][0]; */
+        subjectList.text = selectArray[k];
+        subjectList.value = selectArray[k];
+      
+        element_subject.append(subjectList, element_subject[null]); 
 
-          len = selectList.push(String(contents1[0].values[i][[0]]));
-          selectList1.push("2024f");
-        };
-        console.log("selectList in: ",selectList);
-        selectList2 = selectList.concat("aaa");
-        console.log("selectList2 in: ",selectList2);
-    };
-    search1.send(); 
-    console.log("selectList out: ",  selectList);
-    console.log("selectList2 out: ",  selectList2);
+          
 
-  });
+      };
 
-//var selectList1=["2020a","2021b","2023d"];
+      var value = document.getElementById("selDataset").value;
+        
+      //console.log("value: ", value);
+      choroplethMap(value);
+      trendLine(value);
+  };
+  search.send(); 
+}); 
 
-console.log("selectList1:--", selectList1);
-console.log("selectList1:length", selectList1.length);
-
-  */
- for ( var k in selectList ) {
-  var subjectList = document.createElement("option");
-
-  //subjectList.text = parseInt(select[i]);
-  subjectList.text = selectList[k];
-  subjectList.value = selectList[k];
-
-  element_subject.append(subjectList, element_subject[null]); 
- };
-
- var value = document.getElementById("selDataset").value;
+var element_suburb = document.getElementById("selSuburb");
 
  //sql.js get suburb list
- var config = {locateFile: () => "static/js/sql-wasm.wasm"}
+var config = {locateFile: () => "static/js/sql-wasm.wasm"}
 
 const suburbArray=[];
  initSqlJs(config).then(function(SQL){
@@ -476,8 +478,6 @@ const suburbArray=[];
   search.send();
 }); 
 
-choroplethMap(value);
-trendLine(value);
 
 function optionChanged(value){
 
@@ -486,7 +486,5 @@ function optionChanged(value){
 }
 
 function suburbChanged(suburb){
-
   suburbBar(suburb)
-
 }
