@@ -71,3 +71,5 @@ body {
     #selSuburb {
       margin-top: 0px;
     }
+
+    ul{list-style-type: none;}

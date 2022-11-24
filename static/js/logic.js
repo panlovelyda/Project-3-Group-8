@@ -216,16 +216,6 @@ function suburbBar(value)
 
         var plotData = [trace1, trace2];
 //
-/*           var plotData = [{
-            x: xList1,
-            y: yList1,
-            //text: yList,
-            //orientation:'h',
-            marker: {
-              color: 'rgba(255,153,51,0.6)',
-              width: 1
-            },
-            type:"bar"}]; */
 
           let layout = {
             title: {
@@ -372,7 +362,6 @@ function trendLine(value){
           graphDiv = document.getElementById('line');
           Plotly.newPlot("line", Plotdata, layout,config); 
           
-          //Plotly.newPlot('myDiv', data, layout,config);
           //
         };
        search.send();
@@ -384,7 +373,7 @@ function trendLine(value){
 var element_subject = document.getElementById("selDataset");
 
 //var selectList=['2011-2021','Growth PA','2021-2022','2020-2021','2019-2020','2018-2019','2017-2018','2016-2017','2015-2016','2014-2015','2013-2014','2012-2013','2011-2012','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021']
-//* * //let selectList = new Array();
+
 var selectArray = [];
 
 // sql.js
@@ -419,15 +408,10 @@ initSqlJs(config).then(function(SQL){
       for ( var k in selectArray ) {
         var subjectList = document.createElement("option");
       
-        //subjectList.text = parseInt(select[i]);
-/*           subjectList.text = contents6[0].values[k][0];
-        subjectList.value = contents6[0].values[k][0]; */
         subjectList.text = selectArray[k];
         subjectList.value = selectArray[k];
       
         element_subject.append(subjectList, element_subject[null]); 
-
-          
 
       };
 
