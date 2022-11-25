@@ -1,4 +1,4 @@
-document.getElementsByClassName("jumbotron")[0].style.background = "url('https://www.worldtravelguide.net/wp-content/uploads/2017/04/Think-Australia-Victoria-Apostle-635720252-NickWilms-copy.jpg') repeat-x center";
+document.getElementsByClassName("jumbotron")[0].style.background = "url('static/image/20221014.gif') repeat-x center";
 document.getElementsByClassName("jumbotron")[0].style.color = "white";
 document.getElementsByClassName("jumbotron")[0].style.textShadow = "4px 6px 5px #000000";
 document.getElementsByClassName("jumbotron")[0].style.fontWeight = "bold";
@@ -50,7 +50,7 @@ d3.json(geoData).then(function(response) {
             var table = 'change';
             var column = 'period';
           }
-          var SQLstmt= `SELECT * FROM ${table} where ${column} = '${value}'`;
+          var SQLstmt= `SELECT * FROM ${table} where ${column} = '${value}' order by ${column}`;
 
           const contents = db.exec(SQLstmt);
           //console.log("contents",contents);
@@ -82,7 +82,7 @@ d3.json(geoData).then(function(response) {
               if ( value.length == 4 ) {
                 layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Median: $${feature.properties.vic_loca_8}</h4><button onclick="buttonFunction('${feature.properties.vic_loca_2}')">Median History</button>`);
               }
-              else {                layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Growth Rate: ${feature.properties.vic_loca_8}%</h4><button onclick="buttonFunction('${feature.properties.vic_loca_2}')">Median History</button>`);
+              else { layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Growth Rate: ${feature.properties.vic_loca_8}%</h4><button onclick="buttonFunction('${feature.properties.vic_loca_2}')">Median History</button>`);
               }
             // when button in popup was press
             buttonFunction  = (suburb) => {
@@ -113,7 +113,7 @@ d3.json(geoData).then(function(response) {
             var labels = [];
         
             // Notice
-            div.innerHTML = `<div class="labels"><div class "notice">White means no data</div></div>`;
+            div.innerHTML = `<div class="labels"><div class "notice">White means NA</div></div>`;
 
             var lastlimit;
             limits.forEach(function (limit, index) {
@@ -198,7 +198,7 @@ function suburbBar(value)
           name: 'Growth Rate',
           type: 'scatter',
           marker: {
-            color: 'rgba(1, 152, 137,0.8)',
+            //color: 'rgba(255, 127, 14, 0.8)',
             width: 4
           }
         };
@@ -209,7 +209,7 @@ function suburbBar(value)
           name: 'House Median',
           type: 'bar',
           marker: {
-            color: 'rgba(35,203,127,0.6)',
+            color: 'rgba(73, 164, 0, 0.8)',
             width: 1
           }
         };
@@ -219,7 +219,7 @@ function suburbBar(value)
 
           let layout = {
             title: {
-              text:`<b>${value}</b><br>House Median`},
+              text:`<b>${value}</b>`},
 /*             height: 450,
             width: 450,  */
             margin: {"t": 80, "b": 80, "l": 80, "r": 10},
