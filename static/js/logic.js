@@ -7,137 +7,145 @@ document.getElementsByClassName("jumbotron")[0].style.fontVariant = "small-caps"
 var myMap
 
 function choroplethMap(value) {
-// Creating the map object
-if ( myMap != undefined ) {
-  myMap.off();
-  myMap.remove();
-}
-myMap = L.map("map", {
-  center: [ -37.813628,  144.963058],
-  zoom: 11,
-  scrollWheelZoom: false
-})
+  // Creating the map object
+  if ( myMap != undefined ) {
+    myMap.off();
+    myMap.remove();
+  }
+  myMap = L.map("map", {
+    center: [ -37.813628,  144.963058],
+    zoom: 11,
+    scrollWheelZoom: false
+  })
 
-// Adding the tile layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(myMap);
+  // Adding the tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(myMap);
 
-// Load the GeoJSON data.
-var geoData = "https://raw.githubusercontent.com/tonywr71/GeoJson-Data/e33126bb38ede356f79737a160aa16f8addfd8b3/suburb-2-vic.geojson";
+  // Load the GeoJSON data.
+  var geoData = "https://raw.githubusercontent.com/tonywr71/GeoJson-Data/e33126bb38ede356f79737a160aa16f8addfd8b3/suburb-2-vic.geojson";
 
-// Get the data with d3.
-d3.json(geoData).then(function(response) {
+  // Get the data with d3.
+  d3.json(geoData).then(function(response) {
 
-  // sql.js
-  var config = {locateFile: () => "static/js/sql-wasm.wasm"}
+    // sql.js
+    var config = {locateFile: () => "static/js/sql-wasm.wasm"}
 
-  initSqlJs(config).then(function(SQL){
-      const search = new XMLHttpRequest();
-      search.open('GET', "static/data/house.sqlite", true);
-      search.responseType = 'arraybuffer';
-      search.onload = e => {
-          const uInt8Array = new Uint8Array(search.response);
-          //console.log("uInt8Array",uInt8Array);
-          const db = new SQL.Database(uInt8Array);
-          //console.log("db",db);
+    initSqlJs(config).then(function(SQL){
+        const search = new XMLHttpRequest();
+        search.open('GET', "static/data/house.sqlite", true);
+        search.responseType = 'arraybuffer';
+        search.onload = e => {
+            const uInt8Array = new Uint8Array(search.response);
+            //console.log("uInt8Array",uInt8Array);
+            const db = new SQL.Database(uInt8Array);
+            //console.log("db",db);
 
-          if (value.length == 4){
-            var table = 'median_house';
-            var column = 'year';
-          }
-          else {
-            var table = 'change';
-            var column = 'period';
-          }
-          var SQLstmt= `SELECT * FROM ${table} where ${column} = '${value}' order by ${column}`;
+            if (value.length == 4){
+              var table = 'median_house';
+              var column = 'year';
+            }
+            else {
+              var table = 'change';
+              var column = 'period';
+            }
+            var SQLstmt= `SELECT * FROM ${table} where ${column} = '${value}'`;
 
-          const contents = db.exec(SQLstmt);
-          //console.log("contents",contents);
+            const contents = db.exec(SQLstmt);
+            //console.log("contents",contents);
 
-          for (var i in response.features) {
-            // default is Not Avaliable
-            response.features[i].properties['vic_loca_8'] = 'NA'
-            //if sqllite have data, save to vic_loca_8
+            for (var i in response.features) {
+              // default is Not Avaliable
+              response.features[i].properties['vic_loca_8'] = 'NA'
+              //if sqllite have data, save to vic_loca_8
 
-            for (var j in contents[0].values) { 
-              if ( contents[0].values[j][0] == response.features[i].properties.vic_loca_2 ) {
-//                 console.log("change suburb: ",contents[0].values[j][0], contents[0].values[j][2]) 
+              for (var j in contents[0].values) { 
+                if ( contents[0].values[j][0] == response.features[i].properties.vic_loca_2 ) {
+                //console.log("change suburb: ",contents[0].values[j][0], contents[0].values[j][2]) 
                 response.features[i].properties['vic_loca_8'] = contents[0].values[j][2]
-              }
-            }
-          }
-
-          var choroplethLayer = L.choropleth(response, {
-            valueProperty: 'vic_loca_8', // which property in the features to use
-            scale: ['yellow', 'green'], // chroma.js scale - include as many as you like
-            steps: 8, // number of breaks or steps in range
-            mode: 'q', // q for quantile, e for equidistant, k for k-means
-            style: {
-              color: '#fff', // border color
-              weight: 2,
-              fillOpacity: 0.8
-            },
-            onEachFeature: function(feature, layer) {
-              if ( value.length == 4 ) {
-                layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Median: $${feature.properties.vic_loca_8}</h4><button onclick="buttonFunction('${feature.properties.vic_loca_2}')">Median History</button>`);
-              }
-              else { layer.bindPopup(`<h4><b>${feature.properties.vic_loca_2}</b></h4><h4><br>${value} Growth Rate: ${feature.properties.vic_loca_8}%</h4><button onclick="buttonFunction('${feature.properties.vic_loca_2}')">Median History</button>`);
-              }
-            // when button in popup was press
-            buttonFunction  = (suburb) => {
-
-                element_suburb = document.getElementById("selSuburb");
-
-                if (element_suburb) {
-                  var x = element_suburb.querySelectorAll(`option[value="${suburb}"]`);
-                  if (x.length === 1) {
-                    //console.log(x[0].index);
-                    document.getElementById("selSuburb").selectedIndex = x[0].index;
-                  }
                 }
-                //document.getElementById("selSuburb").selectedIndex = -1;
-                suburbBar(suburb);
-                myMap.closePopup();
               }
-            //
             }
-          }).addTo(myMap); 
 
-          // Adding the legend to the map
-          var legend = L.control({ position: 'bottomright' });
-          legend.onAdd = function (myMap) {
-            var div = L.DomUtil.create('div', 'info legend');
-            var limits = choroplethLayer.options.limits;
-            var colors = choroplethLayer.options.colors;
-            var labels = [];
-        
-            // Notice
-            div.innerHTML = `<div class="labels"><div class "notice">White means NA</div></div>`;
+            var choroplethLayer = L.choropleth(response, {
+              valueProperty: 'vic_loca_8', // which property in the features to use
+              scale: ['yellow', 'green'], // chroma.js scale - include as many as you like
+              steps: 8, // number of breaks or steps in range
+              mode: 'q', // q for quantile, e for equidistant, k for k-means
+              style: {
+                color: '#fff', // border color
+                weight: 2,
+                fillOpacity: 0.8
+              },
+              onEachFeature: function(feature, layer) {
+                var popupString=`<h4><b>${feature.properties.vic_loca_2}</b></h4>`;
+                if ( feature.properties.vic_loca_8 != 'NA' ) {
+                  if ( value.length == 4) {
+                    popupString=`${popupString}<h4><br>Median: $${feature.properties.vic_loca_8}</h4>`
+                  }
+                  else {
+                    popupString=`${popupString}<h4><br>Growth Rate: ${feature.properties.vic_loca_8}%</h4>`
+                  }
+                  popupString=`${popupString}<button onclick="buttonFunction('${feature.properties.vic_loca_2}')">Median History</button>`
+                } // End of != NA
+                else {
+                  popupString=`${popupString}<h4><br>Data Not Available</h4>`
+                };
+                layer.bindPopup(popupString);
+    
+              // when button in popup was press
+              buttonFunction  = (suburb) => {
 
-            var lastlimit;
-            limits.forEach(function (limit, index) {
-              if ( index == 0 )
-                labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(limit*10)/10}<br clear="all">`);
-              else {
-                labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(lastlimit*10)/10} - ${Math.round(limit*10)/10}<br clear="all">`);
-              }
-              lastlimit=limit;
-            }); 
+                  element_suburb = document.getElementById("selSuburb");
 
-            div.innerHTML += `<div class="info legend"> ${labels.join('')} </div>`;
+                  if (element_suburb) {
+                    var x = element_suburb.querySelectorAll(`option[value="${suburb}"]`);
+                    if (x.length === 1) {
+                      //console.log(x[0].index);
+                      document.getElementById("selSuburb").selectedIndex = x[0].index;
+                    }
+                  }
+                  //document.getElementById("selSuburb").selectedIndex = -1;
+                  suburbBar(suburb);
+                  myMap.closePopup();
+                }
+              //
+              } // End of function call by forEachFeature
+            }).addTo(myMap); 
 
-            return div;
-          };
-          legend.addTo(myMap);
-      };
+            // Adding the legend to the map
+            var legend = L.control({ position: 'bottomright' });
+            legend.onAdd = function (myMap) {
+              var div = L.DomUtil.create('div', 'info legend');
+              var limits = choroplethLayer.options.limits;
+              var colors = choroplethLayer.options.colors;
+              var labels = [];
+          
+              // Notice
+              div.innerHTML = `<div class="labels"><div class "notice">White means NA</div></div>`;
 
-      search.send();
+              var lastlimit;
+              limits.forEach(function (limit, index) {
+                if ( index == 0 )
+                  labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(limit*10)/10}<br clear="all">`);
+                else {
+                  labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(lastlimit*10)/10} - ${Math.round(limit*10)/10}<br clear="all">`);
+                }
+                lastlimit=limit;
+              }); // End of forEach()
 
-  });
-})
+              div.innerHTML += `<div class="info legend"> ${labels.join('')} </div>`;
 
-}
+              return div;
+            }; // End of function (myMap)
+            legend.addTo(myMap);
+        }; // End of e() call by onload
+        search.send();
+      }); // End of initSqlJs()
+  }) // End of d3.json()
+
+} // End of function choroplethMap()
 
 // bar chart for one suburb
 function suburbBar(value)
@@ -160,6 +168,9 @@ function suburbBar(value)
           //console.log("SQLstmt: ",SQLstmt);
 
           const contents1 = db.exec(SQLstmt);
+          if ( contents1.length == 0 ) {
+            return;
+          }
           //console.log("contents1: ",contents1);
 
           var xList1=[];
@@ -386,7 +397,7 @@ initSqlJs(config).then(function(SQL){
   search.onload = e => {
       const uInt8Array = new Uint8Array(search.response);
       const db = new SQL.Database(uInt8Array);
-      var SQLstmt= `SELECT DISTINCT period FROM change order by period`
+      var SQLstmt= `SELECT DISTINCT period FROM change order by period DESC`
       const contents1 = db.exec(SQLstmt);
 
       //console.log("contents",contents1);
