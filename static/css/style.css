@@ -1,0 +1,91 @@
+body {
+    padding: 0;
+    margin: 0;
+  }
+  
+  #map,
+  body,
+  html {
+    height: 100%;
+  }
+  
+  .leaflet-popup-content {
+    text-align: center;
+  }
+
+  .min {
+    background-color: white;
+    color: green;
+  }
+
+  
+  .max {
+    background-color: white;
+    color: red;
+  }
+
+  .legend {
+    text-align: left;
+    line-height: 18px;
+    color: #555;
+  }
+
+  .info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgb(0 0 0 / 20%);
+    border-radius: 5px;
+  }
+
+  .leaflet-popup-content h2{
+    color: darkred;
+  }
+  
+  .legend i {
+    width: 18px;
+    height: 18px;
+    float: left;
+    margin: 0 8px 2px 0;
+    opacity: 1;
+    text-align:justify;
+    text-justify:newspaper;
+  } 
+  
+  .labels h4{
+    text-align: center;
+    font-size: 16px;
+    margin: 8px 12px 8px;
+    color: darkred;
+    }
+
+    #map {
+      position: relative;
+      border: 1px solid black;
+      border-radius: 8px;
+      height: 400px;  /* or as desired */
+      width: 100%;  /* This means "100% of the width of its container", the .col-md-8 */
+    }
+
+    #line {
+      position: relative;
+/*       border: 1px solid black;
+      border-radius: 8px; */
+      height: 400px;  /* or as desired */
+      width: 100%;  /* This means "100% of the width of its container", the .col-md-8 */
+    }
+
+    #bar {
+      position: relative;
+      /* border: 1px solid black;
+      border-radius: 8px; */
+      height: 400px;  /* or as desired */
+      width: 110%;  /* This means "100% of the width of its container", the .col-md-8 */
+    }
+
+    #selSuburb {
+      margin-top: 0px;
+    }
+
+    .nodot{list-style-type: none;}
