@@ -1,8 +1,8 @@
 #  ** Project-3-Group-8: _Victoria Housing Median Price Change from 2011-2021_ **
 ** Project Members:** Selina Matthews | Shaun Xu | Haodong Zhang \
 ** Datasource Link:** https://discover.data.vic.gov.au/dataset/victorian-property-sales-report-median-house-by-suburb-time-series1/historical
-                      https://www.rba.gov.au/statistics/
-                      https://www.wsj.com/market-data/quotes/index/AU/XJO/historical-prices
+                   ** https://www.rba.gov.au/statistics/
+                   ** https://www.wsj.com/market-data/quotes/index/AU/XJO/historical-prices
 
 ## **Project Description / Outline**
 This project will reveal the relationship between Victoria Property Sales Record and the Australian Economic status. Usually, when the bank's interest rates increase, the property price could decrease due to less buying power of the public. However, this is only sometimes the case for some suburbs. This project will mainly focus on the relationship between Median Property Sales Records and Australian Reserve Bank’s Interest Rate. Also will compare the ASX trending and inflation rates during the same period. Through this analysis and visualisation, it would be easier for us to explain which suburbs are most valuable for investment.
