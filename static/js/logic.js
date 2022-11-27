@@ -126,11 +126,31 @@ function choroplethMap(value) {
               div.innerHTML = `<div class="labels"><div class "notice">White means NA</div></div>`;
 
               var lastlimit;
+/* 
+              if (value.length == 4){
+                var table = 'median_house';
+                var column = 'year';
+              }
+              else {
+                var table = 'change';
+                var column = 'period';
+              } */
               limits.forEach(function (limit, index) {
                 if ( index == 0 )
-                  labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(limit*10)/10}<br clear="all">`);
+                  if (value.length == 4){
+                    labels.push(`<i style="background-color:  ${colors[index]}"></i>  $${Math.round(limit*10)/10}<br clear="all">`);
+                  } else {
+                    labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(limit*10)/10} %<br clear="all">`);
+                    //labels.push(`<i style="background-color:  ${colors[index]}"></i>  $${Math.round(lastlimit*10)/10} - ${Math.round(limit*10)/10} %<br clear="all">`);
+                  }
                 else {
-                  labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(lastlimit*10)/10} - ${Math.round(limit*10)/10}<br clear="all">`);
+                  if (value.length == 4){
+                    labels.push(`<i style="background-color:  ${colors[index]}"></i>  $${Math.round(lastlimit*10)/10} - $${Math.round(limit*10)/10}<br clear="all">`);
+                    //labels.push(`<i style="background-color:  ${colors[index]}"></i>  $${Math.round(limit*10)/10}<br clear="all">`);
+                  } else {
+                    labels.push(`<i style="background-color:  ${colors[index]}"></i>  ${Math.round(lastlimit*10)/10} % - ${Math.round(limit*10)/10} %<br clear="all">`);
+                  }
+                  
                 }
                 lastlimit=limit;
               }); // End of forEach()
